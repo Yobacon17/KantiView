@@ -1,0 +1,1052 @@
+package com.example.myapplication
+
+import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
+import android.widget.FrameLayout
+import androidx.appcompat.app.AppCompatActivity
+import com.panoramagl.PLImage
+import com.panoramagl.PLManager
+import com.panoramagl.PLSphericalPanorama
+import com.panoramagl.utils.PLUtils
+
+class MainActivity : AppCompatActivity() {
+    private lateinit var flView: FrameLayout
+    private lateinit var plManager: PLManager
+
+    /*Schema ist der Anfangsbuchstabe der Etage, dann s für stock,
+     danach l oder r oder m also links oder rechts oder mitte und ganz zum schluss v oder l für Variable oder Liste*/
+
+
+    //Turnhalle unten
+    val turnu = arrayOf(R.raw.Tu1,R.raw.Tu2,R.raw.Tu3,R.raw.Tu4)
+
+    var turnuv = 0
+
+    //Turnhalle oben
+    val turno = arrayOf(R.raw.To1,R.raw.To2,R.raw.To3)
+
+    var turnov = 0
+
+    //UGZ
+    val ugz = arrayOf(R.raw.uz1,R.raw.uz2,R.raw.uz3,R.raw.uz4,R.raw.uz5)
+
+    var ugzv=0
+
+    //UGE r
+    val uger = arrayOf(R.raw.ur1)
+
+    var ugerv =0
+
+
+    // UGE l
+    val ugel = arrayOf(R.raw.ul1)
+
+    var ugev =0
+
+    //Variable Aula
+    val aula = arrayOf(R.raw.Au1,R.raw.Au2,R.raw.Au3,R.raw.Au4,R.raw.Au5,R.raw.Au6,R.raw.Au7)
+
+    var aulav= 0
+
+
+    //Variable Mensa
+    val mensa = arrayOf(R.raw.M1,R.raw.M2)
+
+    var mensav = 0
+
+    //Variable und Liste für Eingangshalle
+    val pano = arrayOf(R.raw.eh1,R.raw.eh2,R.raw.eh3)
+    var n = 0
+
+    //Variable erster stock links
+    var eslv=0
+    val esll = arrayOf(R.raw.el1,R.raw.el2,R.raw.el3,R.raw.el4,R.raw.el5)
+
+    val eslz= arrayOf(R.raw.Zi19,R.raw.Zi18,R.raw.Zi17,R.raw.Zi16)
+    var eslzv=0
+
+
+    //Variable erster stock rechts
+    var esrv=0
+    val esrl= arrayOf(R.raw.er1)
+
+
+    //Variable zweiter Stock mitte
+    var zsmv=0
+    val zsml= arrayOf(R.raw.z1,R.raw.z2)
+
+    val zsmz= arrayOf(R.raw.Zi21,R.raw.Zi23,R.raw.Zi24,R.raw.Zi25)
+    var zsmzv=0
+
+
+
+
+
+    // dritter Stock links
+    var dslv= 0
+    val dsll= arrayOf(R.raw.dl1,R.raw.dl2,R.raw.dl3,R.raw.dl4,R.raw.dl5,R.raw.dl6,R.raw.dl7)
+
+    val dslz= arrayOf(R.raw.ZiH1,R.raw.Zi40,R.raw.Zi38,R.raw.Zi37,R.raw.Zi36)
+    var dslzv=0
+
+
+
+    //dritter Stock rechts
+    var dsrv=0
+    val dsrl= arrayOf(R.raw.dr1,R.raw.dr2,R.raw.dr3,R.raw.dr4,R.raw.dr5,R.raw.dr6,R.raw.dr7)
+
+    val dsrz= arrayOf(R.raw.Zi53,R.raw.Zi54,R.raw.Zi55,R.raw.Zi56_57_58,R.raw.Zi56_57_58,R.raw.Zi56_57_58)
+    var dsrzv=0
+
+
+
+
+
+    //vierter Stock mitte
+    var vsmv=0
+    val vsml= arrayOf(R.raw.v1,R.raw.v2)
+
+    val vsmz= arrayOf(R.raw.Zi51,R.raw.Zi52,R.raw.Zi48,R.raw.Zi49)
+    var vsmzv=0
+
+
+
+
+    //fünfter Stock links
+    var fslv=0
+    val fsll= arrayOf(R.raw.fl1,R.raw.fl2,R.raw.fl3,R.raw.fl4,R.raw.fl5)
+
+    val fslz= arrayOf(R.raw.ZiH2,R.raw.Zi62,R.raw.Zi61,R.raw.Zi59)
+    var fslzv=0
+
+
+
+    //fünfter Stock rechts
+    var fsrv=0
+    val fsrl= arrayOf(R.raw.fr1,R.raw.fr2,R.raw.fr3,R.raw.fr4,R.raw.fr5,R.raw.fr6,R.raw.fr7,R.raw.fr8)
+
+    val fsrz= arrayOf(R.raw.Zi73,R.raw.Zi74,R.raw.Zi75,R.raw.Zi76,R.raw.Zi77,R.raw.Zi78,R.raw.Zi79)
+    var fsrzv=0
+
+
+
+    //sechster Stock mitte
+    var ssmv=0
+    val ssml= arrayOf(R.raw.s1,R.raw.s2)
+
+    val ssmz= arrayOf(R.raw.Zi68,R.raw.Zi70,R.raw.Zi71,R.raw.Zi72)
+    var ssmzv=0
+
+
+
+
+
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        //Layout für die Panorama-View
+        flView = findViewById(R.id.fl_view)
+
+        //Attribute für die Panorama-View
+        initialisePlManager()
+
+        //Macht das Panorama zu einer Kugel
+        val panorama = PLSphericalPanorama()
+        panorama.camera.lookAt(30.0f, 90.0f)
+        panorama.setImage(PLImage(PLUtils.getBitmap(this,pano[n])))
+        plManager.panorama = panorama
+
+    }
+
+    //Funktion für die Attributen
+    private fun initialisePlManager(){
+        plManager= PLManager(this).apply{
+            setContentView(flView)
+            onCreate()
+            // macht es scrollbar
+            isScrollingEnabled = true
+
+            //
+            isAccelerometerEnabled = true
+
+            //macht es Zoombar
+            isZoomEnabled = true
+
+            //
+            isInertiaEnabled = true
+
+
+            isAcceleratedTouchScrollingEnabled = true
+
+
+        }
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return plManager.onTouchEvent(event!!)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        plManager?.onResume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        plManager.onDestroy()
+    }
+
+
+
+
+
+
+
+    //Funktionen für die Buttons für das nächste Bild
+    fun nextPano(view:View){
+        val panorama = PLSphericalPanorama()
+        initialisePlManager()
+
+        //Nächstes Bild UGZ
+        if((ugzv>=0)or(ugzv<=4)){
+            ugzv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,ugz[ugzv])))
+
+        }
+
+        //Nächstes bild auf Turnhalle unten
+        if((turnuv>=0)or(turnuv<=3)){
+            turnuv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,turnu[turnuv])))
+        }
+
+        //Nächstes bild auf Turnhalle oben
+        if ((turnov>=0)or(turnov<=2)){
+            turnov+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,turno[turnov])))
+        }
+
+
+        //Nächstes Bild auf Aula, 10 Bilder
+        if ((aulav>=0) and(aulav<=2) or (aulav>=4)and (n<=9)){
+            aulav+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,aula[aulav])))
+        }
+
+        //Nächstes Bild auf Mensa, 2 Bilder
+        if ((mensav==0)){
+            mensav+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,mensa[mensav])))
+        }
+
+        //Nächstes Bild auf Eingangshalle
+        if ((n>=0) and (n<=2)){
+            n+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,pano[n])))
+        }
+
+        //Nächstes Bild erster Stock linke seite
+        if((eslv==0)or(eslv<=5)and(eslv>=2)){
+
+            eslv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,esll[eslv])))
+        }
+
+
+        //Nächstes Bild erster Stock rechten Steite
+        if ((esrv==0)){
+            esrv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,esrl[esrv])))
+        }
+
+        //Nächstes Bild zweiter Stock mitte
+        if ((zsmv>=0)and(zsmv<=1)){
+            zsmv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,zsml[zsmv])))
+        }
+
+        //Nächstes Bild dritter Stock links
+        if ((dslv==0)or(dslv>=2)and(dslv<=6)){
+            dslv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,dsll[dslv])))
+        }
+
+        //Nächstes Bild dritter Stock rechts
+        if((dsrv==0)or(dsrv>=2)and(dsrv<=6)) {
+            dsrv += 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+        }
+
+        //Nächstes Bild vierter Stock Mitte
+        if ((vsmv>=0)and(vsmv<=1)){
+            vsmv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,vsml[vsmv])))
+        }
+
+        //Nächstes Bild fünfter Stock links
+        if ((fslv==0)or(fslv>=2)and(fslv<=4)){
+            fslv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,fsll[fslv])))
+
+        }
+
+        //Nächstes Bild Fünfter Stock rechts
+        if ((fsrv==0)or(fsrv>=2)and(fsrv<=6)){
+            fsrv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,fsrl[fsrv])))
+        }
+
+        //Nächstes Bild sechster Stock Mitte
+        if ((ssmv>=0)and(ssmv<=1)){
+            ssmv+=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,ssml[ssmv])))
+        }
+
+        panorama.camera.lookAt(30.0f, 90.0f)
+        plManager.panorama=panorama
+    }
+
+
+
+
+
+
+
+
+    fun backPano(view:View){
+        val panorama = PLSphericalPanorama()
+        initialisePlManager()
+
+        //Vorheriges Bild UGZ
+        if((ugzv>=0)or(ugzv<=4)){
+            ugzv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,ugz[ugzv])))
+
+        }
+
+        //Vorheriges bild auf Turnhalle unten
+        if((turnuv>=0)or(turnuv<=3)){
+            turnuv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,turnu[turnuv])))
+        }
+
+        //Vroheriges bild auf Turnhalle oben
+        if ((turnov>=0)or(turnov<=2)){
+            turnov-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,turno[turnov])))
+        }
+
+        //Vorheriges Bild auf Aula
+        if ((aulav>=1) and (aulav<=2) or (aulav>=4)and (aulav<=6)){
+            aulav-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,aula[aulav])))
+        }
+
+        //Vorheriges Bild auf Mensa
+        if ((mensav==2)){
+            mensav-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,mensa[mensav])))
+        }
+
+        //Vorheriges Bild auf Eingangshalle
+        if ((n>=0) and (n<=9)){
+            n-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,pano[n])))
+        }
+
+
+        //Vorheriges Bild erster Stock linke seite
+        if((eslv==0)or(eslv<=5)and(eslv>=2)){
+
+            eslv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,esll[eslv])))
+        }
+
+
+        //Vorheriges Bild erster Stock rechten Steite
+        if ((esrv==0)or(esrv>=2)and(esrv<=9)){
+            esrv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,esrl[esrv])))
+        }
+
+        //Vorheriges Bild zweiter Stock mitte
+        if ((zsmv>=1)and(zsmv<=1)){
+            zsmv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,zsml[zsmv])))
+        }
+
+        //Vorheriges Bild dritter Stock links
+        if ((dslv==0)or(dslv>=2)and(dslv<=3)){
+            dslv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,dsll[dslv])))
+        }
+
+        //Vorheriges Bild dritter Stock rechts
+        if((dsrv==0)or(dsrv>=2)and(dsrv<=4)) {
+            dsrv -= 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+        }
+
+        //Vorheriges Bild vierter Stock Mitte
+        if ((vsmv>=1)and(vsmv<=3)){
+            vsmv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,vsml[vsmv])))
+        }
+
+        //Vorheriges Bild fünfter Stock links
+        if ((fslv==0)or(fslv>=2)and(fslv<=5)){
+            fslv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,fsll[fslv])))
+
+        }
+
+        //Vorheriges Bild Fünfter Stock rechts
+        if ((fsrv==0)or(fsrv>=2)and(fsrv<=4)){
+            fsrv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,fsrl[fsrv])))
+        }
+
+        //Vorheriges Bild sechster Stock Mitte
+        if ((ssmv>=1)and(ssmv<=3)){
+            ssmv-=1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this,ssml[ssmv])))
+        }
+
+        panorama.camera.lookAt(30.0f, 90.0f)
+        plManager.panorama=panorama
+    }
+
+
+
+
+
+
+
+    fun up(view:View) {
+        val panorama = PLSphericalPanorama()
+        initialisePlManager()
+        //Von UGZl zum UGEl
+        if ((ugzv == 0)) {
+            ugzv == 0
+            ugev == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ugel[ugev])))
+        }
+        //Von UGZr zum UGEr
+        if ((ugzv == 3)) {
+            ugzv == 0
+            ugerv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, uger[ugerv])))
+        }
+
+        //von UGE l nach Aula
+        if ((ugev == 0)) {
+            ugev == 0
+            aulav == 3
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, aula[aulav])))
+
+        }
+
+        //von UGE r nach Mensa
+        if ((ugerv == 0)) {
+            ugerv == 0
+            mensav == 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, mensa[mensav])))
+        }
+
+        //Von Trunhalle unten nach turnhalle oben
+        if ((turnuv == 0)) {
+            turnuv == 0
+            turnov == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, turno[turnov])))
+        }
+
+        //Von der Mensa zur Eingangshalle
+        if ((mensav == 1)){
+            mensav == 0
+            n==0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, pano[n])))
+        }
+
+        //Von der Aula zur Eingangshalle
+        if ((aulav == 3)) {
+            aulav == 0
+            n == 3
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, pano[n])))
+        }
+
+
+        //Von der Eingangshalle zum ersten Stock l
+        if ((n == 0)) {
+            n == 0
+            eslv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esll[eslv])))
+        }
+
+        //Von der Eingangshalle zum ersten Stock r
+        if ((n == 2)) {
+            n == 0
+            esrv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esrl[esrv])))
+        }
+
+        //Von erster stock l zum zweiten Stock
+        if ((eslv == 1)) {
+            eslv == 0
+            zsmv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsml[zsmv])))
+        }
+
+        //Von ersten Stock links zum zweiten Stock
+        if ((esrv == 1)) {
+            esrv == 0
+            zsmv == 2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsml[zsmv])))
+        }
+
+        //Von zweiten Stock zum dritten stock l
+        if ((zsmv == 2)) {
+            zsmv == 0
+            dslv == 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsll[dslv])))
+        }
+
+        //von zweiter stock zum dritten stock r
+        if ((zsmv == 0)) {
+            zsmv == 0
+            dsrv == 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+        }
+
+        //von dritter Stock l zum vierten Stock
+        if ((dslv == 1)) {
+            dslv == 0
+            vsmv == 2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, vsml[vsmv])))
+        }
+
+        //von dritten Stock r zum vierten Stock
+        if ((dsrv == 1)) {
+            dsrv == 0
+            vsmv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, vsml[vsmv])))
+        }
+
+        //vom vierten Stock zum fuenften Stock l
+        if ((vsmv == 2)) {
+            vsmv == 0
+            fslv == 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsll[fslv])))
+        }
+
+        //vom vierten Stock zum fuenften Stock r
+        if ((vsmv == 0)) {
+            vsmv == 0
+            fsrv == 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsrl[fsrv])))
+        }
+
+        //vom fuenften Stock l zum sechsten Stock
+        if ((fslv == 1)) {
+            fslv == 0
+            ssmv == 2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ssml[ssmv])))
+        }
+
+        //vom fuenften stock r zum sechsten Stock
+        if ((fsrv == 1)){
+            fsrv == 0
+            ssmv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ssml[ssmv])))
+        }
+
+        panorama.camera.lookAt(30.0f, 90.0f)
+        plManager.panorama=panorama
+
+    }
+
+
+   //-----------------------------------------------------------------------------------------------
+
+
+    //Butten unten
+    fun down(view:View){
+        val panorama = PLSphericalPanorama()
+        initialisePlManager()
+        //Von UGEl zum UGZ
+        if ((ugev == 0)) {
+            ugev == 0
+            ugzv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ugz[ugzv])))
+        }
+
+        //UGEr zum UGZ
+        if ((ugerv == 0)) {
+            ugzv == 3
+            ugerv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ugz[ugzv])))
+        }
+
+        //von Aula nach UGE l
+        if ((aulav == 3)) {
+            ugerv == 0
+            aulav == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ugel[ugev])))
+
+        }
+
+        //von Mensa nach UGEr
+        if ((mensav == 1)) {
+            ugev == 0
+            mensav == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, uger[ugerv])))
+        }
+
+        //Von Trunhalle oben nach Turnhalle unten
+        if ((turnov == 0)) {
+            turnuv == 0
+            turnov == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, turnu[turnuv])))
+        }
+
+        //Von der Eingangshalle zur Mensa
+        if ((n==0)){
+            mensav == 0
+            n==0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, mensa[mensav])))
+        }
+
+        //Von der Aula zur Eingangshalle
+        if ((n == 3)) {
+            aulav == 0
+            n == 3
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, aula[aulav])))
+        }
+
+        //Vom ersten Stock l zur Eingangshalle
+        if ((eslv == 1)) {
+            n == 3
+            eslv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, pano[n])))
+        }
+
+        //Vom ersten Stock r zur Eingangshalle
+        if ((esrv == 1)) {
+            n == 0
+            esrv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, pano[n])))
+        }
+
+        //Vom zweiten Stock zum ersten Stockl
+        if ((zsmv == 3)) {
+            eslv == 0
+            zsmv == 3
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esll[eslv])))
+        }
+
+        //Von ersten Stock links zum zweiten Stock
+        if ((zsmv == 0)) {
+            esrv == 0
+            zsmv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esrl[esrv])))
+        }
+
+        //Vom dritten Stock l zum zweiten Stock
+        if ((dslv == 1)) {
+            zsmv == 3
+            dslv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsml[zsmv])))
+        }
+
+        //vom dritter Stock r zum zweiten Stock
+        if ((dsrv == 1)) {
+            zsmv == 0
+            dsrv == 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsml[zsmv])))
+        }
+
+        //vom vierten Stock zum dritten Stock l
+        if ((vsmv == 2)) {
+            dslv == 1
+            vsmv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsll[dslv])))
+        }
+
+        //vom vierten Stock zum dritten Stock r
+        if ((vsmv == 0)) {
+            dsrv == 1
+            vsmv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+        }
+
+        //vom fuenften Stock l zum vierten Stock
+
+        if ((fslv == 1)) {
+            vsmv == 2
+            fslv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, vsml[vsmv])))
+        }
+
+        //vom fuenften Stock r zum vierten Stock
+        if ((fsrv == 1)) {
+            vsmv == 0
+            fsrv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, vsml[vsmv])))
+        }
+
+        //vom sechstenden Stock zum fuenften Stock l
+        if ((ssmv == 2)) {
+            fslv == 1
+            ssmv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsll[fslv])))
+        }
+
+        //vom sechster Stock zum fuenften Stock r
+        if ((ssmv == 0)){
+            fsrv == 1
+            ssmv == 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsrl[fsrv])))
+        }
+
+
+
+
+        panorama.camera.lookAt(30.0f, 90.0f)
+        plManager.panorama=panorama
+
+    }
+
+
+    fun left(view:View) {
+        val panorama = PLSphericalPanorama()
+        initialisePlManager()
+        //Mensa nach links
+        if ((mensav == 1)) {
+            mensav -= 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, mensa[mensav])))
+        }
+
+
+        //Aula zu Turnhalle oben
+        if ((turnov == 2)){
+            turnov = 2
+            aulav = 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, turno[turnov])))
+        }
+
+        //Erster Stock links Treppe nach links
+        if ((eslv == 1)){
+            eslv = 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esll[eslv])))
+        }
+
+        //Von Zimmer zum ersten Stock links
+        if ((eslzv == 0)){
+            eslv=0
+            eslzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esll[eslv])))
+
+        }
+        if ((eslzv >= 1)and(eslzv<=3)){
+            eslv=eslzv+1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esll[eslv])))
+
+        }
+
+        //von zweiterstock zu den zimmern
+        if ((zsmv>=0)or(zsmv<=1)){
+            zsmzv=zsmv+2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsmz[zsmzv])))
+        }
+
+        //von zweiterstock zimmern zum zweiten Stock
+        if ((zsmzv<=3)and(zsmzv>=2)){
+            zsmv=zsmzv-2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsml[zsmv])))
+        }
+
+
+        //dritter Stock links Treppe nach links
+        if ((dslv == 1)){
+            dslv =0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsll[dslv])))
+        }
+
+        //Von Zimmer zum dritten Stock links
+        if ((dslzv == 0)){
+            dslv=0
+            dslzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsll[dslv])))
+
+        }
+        if ((dslzv >= 1)and(dslzv<=3)){
+            dslv=dslzv+1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsll[dslv])))
+
+        }
+
+
+        //dritter Stock rechts Treppe nach rechts
+        if ((dsrv == 1)){
+            dsrv =0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+        }
+
+        //Von Zimmer zum dritten Stock rechts
+        if ((dsrzv == 0)){
+            dsrv=0
+            dsrzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+
+        }
+        if ((dsrzv >= 1)and(dsrzv<=3)){
+            dsrv=dsrzv+1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+
+        }
+
+        //von vierterstock zu den zimmern
+        if ((vsmv>=0)or(vsmv<=1)){
+            vsmzv=vsmv+2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, vsmz[vsmzv])))
+        }
+
+        //von Zimmern zum vierten Stock
+        if ((vsmzv<=3)and(vsmzv>=2)){
+            vsmv=vsmzv-2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, vsml[vsmv])))
+        }
+
+
+        //fünfter Stock links Treppe nach links
+        if ((fslv == 1)){
+            fslv =0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsll[fslv])))
+        }
+        //Von Zimmer zum dritten Stock links
+        if ((fslzv == 0)){
+            fslv=0
+            fslzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsll[fslv])))
+
+        }
+        if ((fslzv >= 1)and(fslzv<=3)){
+            fslv=fslzv+1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsll[fslv])))
+
+        }
+
+
+        //fünfter Stock rechts Treppe nach rechts
+        if ((fsrv == 1)){
+            fsrv =0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsrl[fsrv])))
+        }
+        //Von Zimmer zum dritten Stock rechts
+        if ((fsrzv == 0)){
+            fsrv=0
+            fsrzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsrl[fsrv])))
+
+        }
+        if ((fsrzv >= 1)and(fsrzv<=3)){
+            fsrv=fsrzv+1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsrl[fsrv])))
+
+        }
+
+
+        //von sechsterstock zu den Zimmern
+        if ((ssmv>=0)or(ssmv<=1)){
+            ssmzv=ssmv+2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ssmz[ssmzv])))
+        }
+
+        //von Zimmern zum sechsten Stock
+        if ((ssmzv<=3)and(ssmzv>=2)){
+            ssmv=ssmzv-2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsml[zsmv])))
+        }
+        panorama.camera.lookAt(30.0f, 90.0f)
+        plManager.panorama=panorama
+    }
+
+
+
+
+
+
+    fun rechts(view:View){
+        val panorama = PLSphericalPanorama()
+        initialisePlManager()
+
+        //Mensatreppe nach
+        if ((mensav == 0)) {
+            mensav += 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, mensa[mensav])))
+        }
+
+        //Turnhalleuntentreppe nach Links
+        if ((turnuv == 0)) {
+            turnuv += 1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, turnu[turnuv])))
+
+        }
+
+        //Turnhalle zu ug2
+        if ((turnuv == 3)) {
+            turnuv = 0
+            ugzv = 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ugz[ugzv])))
+        }
+
+        //Turnhalle oben zu Aula
+        if ((aulav == 9)){
+            turnov = 2
+            aulav = 0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, turno[turnov])))
+        }
+
+        //Erster Stock links Treppe nach links
+        if ((eslv == 1)){
+            eslv = 2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esll[eslv])))
+        }
+
+        //Von Zimmer zum ersten Stock links
+        if ((eslv == 0)){
+            eslv=0
+            eslzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, eslz[eslzv])))
+
+        }
+        if ((eslv >= 1)and(eslv<=3)){
+            eslzv=eslv-1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, esll[eslv])))
+
+        }
+
+        //von zweiterstock zimmern zum zweiten Stock
+        if ((zsmzv>=2)or(zsmzv<=3)){
+            zsmv=zsmzv-2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsml[zsmv])))
+        }
+
+        //von zweiterstock zu den zimmern
+        if ((zsmv<=1)and(zsmv>=0)){
+            zsmzv=zsmv
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsmz[zsmzv])))
+        }
+
+
+        //dritter Stock links Treppe nach rechts
+        if ((dslv == 1)){
+            dslv =2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsll[dslv])))
+        }
+
+        //Von  dritten Stock links zum Zimmer
+        if ((dslv == 0)){
+            dslv=0
+            dslzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dslz[dslzv])))
+
+        }
+        if ((dslv >= 2)and(dslv<=4)){
+            dslzv=dslv-1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dslz[dslzv])))
+
+        }
+
+
+        //dritter Stock rechts Treppe nach rechts
+        if ((dsrv == 1)){
+            dsrv =2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+        }
+
+        //Von Zimmer zum dritten Stock rechts
+        if ((dsrv == 0)){
+            dsrv=0
+            dsrzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrz[dsrzv])))
+
+        }
+        if ((dsrv >= 1)and(dsrv<=6)){
+            dsrzv=dsrv-1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, dsrl[dsrv])))
+
+        }
+
+        //von vierterstock zimmern zum vierten Stock
+        if ((vsmzv>=2)or(vsmzv<=3)){
+            vsmv=vsmzv-2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, vsml[vsmv])))
+        }
+
+        //von vierterstock zu den zimmern
+        if ((vsmv<=1)and(vsmv>=0)){
+            vsmzv=vsmv
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, vsmz[vsmzv])))
+        }
+
+
+        //fünfter Stock links Treppe nach rechts
+        if ((fslv == 1)){
+            fslv =2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsll[fslv])))
+        }
+        //Von fünfter Stock links zum Zimmer
+        if ((fslv == 0)){
+            fslv=0
+            fslzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fslz[fslzv])))
+
+        }
+        if ((fslv >= 2)and(fslv<=4)){
+            fslzv=fslv-1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fslz[fslzv])))
+
+        }
+
+
+        //fünfter Stock rechts Treppe nach rechts
+        if ((fsrv == 1)){
+            fsrv =2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsrl[fsrv])))
+        }
+        //Von fünfter Stock rechts zu Zimmern
+        if ((fsrv == 0)){
+            fsrv=0
+            fsrzv=0
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsrz[fsrzv])))
+
+        }
+        if ((fsrv >= 2)and(fsrv<=7)){
+            fsrzv=fsrv-1
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, fsrz[fsrzv])))
+
+        }
+
+
+        //von Zimmern zum sechsten Stock
+        if ((ssmzv>=2)or(ssmv<=3)){
+            ssmv=ssmzv-2
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, ssml[ssmv])))
+        }
+
+        //von Zimmern zum sechsten Stock
+        if ((ssmv<=0)and(ssmv>=1)){
+            ssmzv=ssmv
+            panorama.setImage(PLImage(PLUtils.getBitmap(this, zsmz[zsmzv])))
+        }
+        panorama.camera.lookAt(30.0f, 90.0f)
+        plManager.panorama=panorama
+
+    }
+
+
+}
